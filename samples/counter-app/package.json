@@ -4,15 +4,22 @@
   "description": "This is a sample folder for CSBC 1040.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx mocha ./public/script.test.js",
     "start": "node index.js",
-    "build": "parcel build public/index.html -d build"
+    "build": "parcel build public/index.html -d build",
+    "lint": "npx eslint index.js public/script.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chai": "^4.3.10",
     "express": "^4.18.2",
+    "jsdom": "^24.0.0",
+    "mocha": "^10.2.0",
     "parcel-bundler": "^1.12.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
   }
 }

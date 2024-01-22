@@ -6,3 +6,5 @@ function incrementCounter() {
   counterValue++;
   counterElement.textContent = counterValue;
 }
+
+module.exports = { counterValue, incrementCounter }
