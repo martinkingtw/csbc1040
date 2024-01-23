@@ -1,0 +1,38 @@
+name: Deploy to AWS Amplify
+
+on:
+  push:
+    branches:
+      - develop
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to AWS Amplify
+    runs-on: ubuntu-latest
+    environment: env
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_DEFAULT_OUTPUT: json
+      AMPLIFY_APP_ID: d2fpa92exdlqjo
+      AMPLIFY_BRANCH_NAME: develop
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Amplify
+        run: |
+          echo "Deploy app $AMPLIFY_APP_ID branch $AMPLIFY_BRANCH_NAME"
+          JOB_ID=$(aws amplify start-job --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH_NAME --job-type RELEASE | jq -r '.jobSummary.jobId')
+          echo "Release started"
+          echo "Job ID is $JOB_ID"
+
+          while [[ "$(aws amplify get-job --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH_NAME --job-id $JOB_ID | jq -r '.job.summary.status')" =~ ^(PENDING|RUNNING)$ ]]; do sleep 1; done
+          JOB_STATUS="$(aws amplify get-job --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH_NAME --job-id $JOB_ID | jq -r '.job.summary.status')"
+          echo "Job finished"
+          echo "Job status is $JOB_STATUS"
